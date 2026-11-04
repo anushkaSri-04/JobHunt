@@ -1,0 +1,104 @@
+# jobhunt configuration. Everything tunable lives here — no editing Python.
+#
+# Tune `filters` first. It is deterministic, free, and it is what keeps the
+# LLM bill small: roughly 2000 raw postings -> 40 candidates before a single
+# token is spent.
+#
+# Profile this is tuned for: final-year (2027 batch) B.Tech AI & Data Science,
+# Python / FastAPI / Django, ML (XGBoost, TensorFlow), RAG + MCP project,
+# one SDE internship. Targets: fresher, intern and associate roles.
+
+filters:
+  # Title regexes, matched case-insensitively against the job title only.
+  # A title must match at least one include AND zero excludes.
+  #
+  # Gotcha: "sde" as a bare regex does NOT match "Software Development
+  # Engineer" — different words entirely. Use \bsde\b for the acronym and
+  # list the spelled-out variants separately, as below.
+  include_titles:
+    # general software / backend
+    - 'software engineer'
+    - 'software development engineer'
+    - '\bsde\b'
+    - '\bsde\s*-?\s*(i|1)(?!\d)'
+    - 'associate software'
+    - 'associate (software )?engineer'
+    - '\b(backend|back-end|python|api)\b.*\b(engineer|developer)\b'
+    - '\b(engineer|developer)\b.*\b(backend|back-end|python)\b'
+    - '\bsite reliability engineer\b'
+    - 'python developer'
+    - 'member of technical staff'
+    # AI / ML / data — your strongest track
+    - '\b(ai|ml|machine learning|generative ai|genai|llm|nlp)\b.*\b(engineer|developer|intern|associate)\b'
+    - '\b(engineer|developer)\b.*\b(ai|ml|machine learning|llm)\b'
+    - 'applied (ai|ml|scientist)'
+    - 'data (science|scientist|engineer|analyst)'
+    - 'decision science'
+    - 'analytics engineer'
+    - 'ai agent'
+    - 'prompt engineer'
+    # early-career labels
+    - '\b(intern|internship|graduate|fresher|new grad|trainee|junior|entry[- ]level|campus)\b'
+    # Research and evaluation roles specifically related to AI/ML
+    - '\b(research|evaluation)\b.*\b(ai|ml|machine learning|llm|genai)\b'
+    - '\b(software|backend|python|ai|ml|data|platform)\b.*\bassociate\b'
+    - '\b(software|backend|ai|ml|data)\b.*\bengineer\s*[-,(]?\s*(i|1)\b'
+
+  # Anything matching these is dropped even if an include matched.
+  exclude_titles:
+    - '\b(strategy and operations|business operations)\b'
+    - '\b(staff|principal|distinguished|fellow|architect)\b'       # far too senior
+    - '\b(senior|sr\.?)\b'                                         # you are a fresher
+    - '\blead\b'
+    - '\b(director|vp|vice president|head of|chief|cto)\b'
+    - '\b(manager|management)\b'
+    - '^\s*software engineer\s+ii\s*$'                                            # "Software Engineer II" asks for 2+ years
+    - '\bl[4-9]\b'
+    - '\b(sales|account executive|marketing|recruit|support|success)\b'
+    - '\b(frontend|front-end|ios|android|mobile|game|designer|qa|test engineer)\b'  # wrong discipline
+    - '\b(devops|security engineer|network|embedded|firmware|kernel)\b'  # no evidence for these
+    - '\b(research scientist|phd)\b'                               # PhD-level roles
+    - '\bintermediate\b'
+    - '\b(ruby|rails|rust|scala|java\b|c#|\.net|php|typescript)\b'   # stacks you don't use
+    - '\b(fullstack|full-stack|full stack)\b'
+    - '\b(information security|security compliance|compliance intern)\b'
+    - '\bc\+\+|cpp\b'
+    - '\bsoftware engineer\s+2\b'
+    - '\b(automation|servicenow)\b'
+    - '\bdata scientist\b.*\bgrowth\b|\bgrowth\b.*\bdata scientist\b'
+    - '\b(sdet|software development engineer in test)\b'
+    - '\b(strategy and operations|business operations)\b'
+
+  # Substrings matched against "<location> <title>", case-insensitive.
+  # Leave empty to accept every location.
+  locations:
+    - mumbai
+    - navi mumbai
+    - pune
+    - bangalore
+    - bengaluru
+    - hyderabad
+    - india
+
+  # If true, anything reading as remote passes the location gate.
+  allow_remote: true
+
+  # Drop postings older than this. Set to null to disable.
+  # Boards often re-stamp `updated_at`, so this is a soft signal, not a promise.
+  max_age_days: 30
+
+# --- LLM stages 
+screen_batch_size: 5      # jobs per screening call. Higher = cheaper, sloppier.
+screen_jd_chars: 1400     # JD truncation for screening
+draft_jd_chars: 6000      # JD truncation for drafting
+score_threshold: 3.5      
+max_per_digest: 5         # hard cap on expensive draft calls per run
+
+# --- paths 
+companies_file: companies.yaml
+profile_file: profile.json
+seen_file: seen.json
+digest_file: out/digest.html
+tracker_csv: out/tracker.csv
+
+skill_match_threshold: 0.35   # reporting threshold for pipeline statistics
