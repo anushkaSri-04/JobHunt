@@ -4,7 +4,7 @@ JobHunt is a Python-based job discovery and matching application that automates 
 
 It fetches job postings from Greenhouse, Lever and Ashby, filters them based on job roles, locations and posting freshness, and calculates a skill-match percentage by comparing job requirements against a user's technical profile.
 
-The application provides a password-protected web dashboard to review opportunities, identify matched and missing skills, track application status, and receive personalized job digests through Gmail.
+The application identify matched and missing skills, track application status, and receive personalized job digests through Gmail.
 
 ## Features
 
